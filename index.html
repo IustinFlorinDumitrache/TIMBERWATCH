@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TimberWatch — Monitorizare Forestieră • România</title>
+</head>
+<body class="bg-gis-bg text-gis-text h-screen w-screen overflow-hidden flex flex-col antialiased font-sans">
+
+  <header class="h-12 bg-gis-panel border-b border-gis-border px-3.5 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center gap-3">
+      <button id="btnMenu" class="lg:hidden px-2 py-1 rounded border border-gis-border" aria-label="Meniu">☰</button>
+      <span class="text-lg" aria-hidden="true">🌲</span>
+      <div class="flex items-baseline gap-2">
+        <span class="font-bold text-sm">TimberWatch</span>
+        <span class="hidden sm:inline text-[11px] text-gis-muted">Monitorizare Forestieră • România</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-[11px]">
+      <div id="baseSwitch" class="flex bg-gis-subtle border border-gis-border rounded-md p-0.5"></div>
+      <button id="btnSplit" class="h-7 px-2.5 rounded-md border border-gis-border bg-gis-panel hover:bg-gis-subtle font-medium">
+        ⇆ <span class="hidden sm:inline">Compară Înainte / După</span>
+      </button>
+      <a id="linkCopernicus" href="#" target="_blank" rel="noopener"
+         class="h-7 px-2.5 rounded-md bg-gis-forest text-white font-medium flex items-center">Copernicus ↗</a>
+    </div>
+  </header>
+
+  <div class="flex-1 flex relative overflow-hidden">
+    <aside id="sidebar" class="w-[340px] max-w-[90vw] bg-gis-panel border-r border-gis-border flex flex-col shrink-0 z-20 absolute lg:static inset-y-0 left-0 transition-transform duration-200 shadow-lg lg:shadow-none">
+      <div class="flex-1 overflow-y-auto divide-y divide-gis-border">
+
+        <section class="p-4 space-y-3">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-gis-muted">Localizare & Interval</span>
+          <label class="block text-xs font-medium">Județ
+            <select id="countySelect" class="mt-1 w-full h-8 border border-gis-strong rounded-md px-2 text-xs"></select>
+          </label>
+          <label class="block text-xs font-medium">Perioadă analiză
+            <select id="periodSelect" class="mt-1 w-full h-8 border border-gis-strong rounded-md px-2 text-xs font-mono disabled:bg-gis-subtle disabled:text-gis-muted"></select>
+          </label>
+          <p id="statusMsg" class="hidden text-[11px] leading-relaxed text-gis-muted bg-gis-subtle border border-gis-border rounded-md p-2"></p>
+        </section>
+
+        <section class="p-4 space-y-2">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-gis-muted block">Straturi hartă</span>
+          <label class="flex items-center justify-between p-2 rounded-md bg-gis-bg border border-gis-border text-xs font-medium cursor-pointer">
+            <span><span class="inline-block w-3 h-3 bg-gis-alert/25 border border-gis-alert mr-2 align-middle"></span>Pierdere vegetație</span>
+            <input type="checkbox" id="toggleLoss" checked class="accent-gis-alert">
+          </label>
+          <label class="flex items-center justify-between p-2 rounded-md bg-gis-bg border border-gis-border text-xs font-medium cursor-pointer">
+            <span><span class="inline-block w-3 h-3 bg-gis-natura/15 border border-dashed border-gis-natura mr-2 align-middle"></span>Arii protejate (Natura 2000)</span>
+            <input type="checkbox" id="toggleProtected" checked class="accent-gis-natura">
+          </label>
+                  </section>
+
+        <section class="p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-gis-muted">Indicatori</span>
+            <span id="activeCounty" class="text-[11px] font-semibold text-gis-forest bg-gis-forest-light px-2 py-0.5 rounded"></span>
+          </div>
+          <div class="grid grid-cols-2 gap-2.5">
+            <div class="p-3 rounded-md bg-gis-bg border border-gis-border"><div class="text-[11px] text-gis-muted">Suprafață afectată</div><div id="kpiArea" class="text-base font-mono font-semibold mt-1.5">—</div></div>
+            <div class="p-3 rounded-md bg-gis-bg border border-gis-border"><div class="text-[11px] text-gis-muted">Zone identificate</div><div id="kpiZones" class="text-base font-mono font-semibold mt-1.5">—</div></div>
+            <div id="kpiProtectedCard" class="p-3 rounded-md bg-gis-bg border border-gis-border"><div class="text-[11px] text-gis-muted">Zone în arii protejate</div><div id="kpiProtected" class="text-base font-mono font-semibold mt-1.5">—</div></div>
+            <div class="p-3 rounded-md bg-gis-bg border border-gis-border"><div class="text-[11px] text-gis-muted">Cea mai mare zonă</div><div id="kpiMax" class="text-base font-mono font-semibold mt-1.5">—</div></div>
+          </div>
+          <p class="text-[11px] text-gis-muted leading-relaxed">Clic pe un poligon roșu pentru detalii. Indicatorii se calculează din datele primite de la sursă.</p>
+        </section>
+      </div>
+
+      <div class="p-3.5 bg-gis-bg border-t border-gis-border space-y-2 shrink-0">
+        <button id="btnExport" class="w-full h-9 rounded-md bg-gis-forest hover:bg-green-800 text-white text-xs font-semibold">Exportă rezumat</button>
+        <p class="text-[10px] text-gis-muted">Contains modified Copernicus Sentinel data</p>
+      </div>
+    </aside>
+
+    <main class="flex-1 relative h-full w-full bg-gis-subtle">
+      <div id="map" class="w-full h-full z-0"></div>
+      <div id="splitOverlay" class="absolute inset-0 z-10 pointer-events-none hidden">
+        <div class="absolute top-3 left-3 bg-gis-panel/95 border border-gis-strong px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-gis-forest" id="splitLabelBefore"></div>
+        <div class="absolute top-3 right-12 bg-gis-panel/95 border border-gis-strong px-2.5 py-1 rounded-md text-[11px] font-mono font-semibold text-gis-alert" id="splitLabelAfter"></div>
+        <div id="splitDivider" style="left:50%;touch-action:none" class="pointer-events-auto absolute top-0 bottom-0 w-0.5 bg-gis-text/80 cursor-ew-resize flex items-center justify-center">
+          <div class="w-8 h-8 rounded-full bg-gis-panel border border-gis-strong shadow flex items-center justify-center text-xs">⇆</div>
+        </div>
+      </div>
+      <div class="absolute bottom-6 right-2.5 z-10 bg-gis-panel/95 border border-gis-strong rounded-md px-2.5 py-1 text-[11px] font-mono shadow-sm pointer-events-none">
+        <span id="cursorCoords">—</span> <span class="text-gis-muted" id="zoomReadout"></span>
+      </div>
+    </main>
+  </div>
+
+  <div id="summaryModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 p-4 overflow-y-auto">
+    <div class="bg-gis-panel border border-gis-strong rounded-lg max-w-lg w-full shadow-xl overflow-hidden my-auto">
+      <div class="px-4 py-3 bg-gis-bg border-b border-gis-border flex items-center justify-between">
+        <span class="text-xs font-semibold">Rezumat public monitorizare forestieră</span>
+        <button id="btnCloseModal" class="px-1" aria-label="Închide">✕</button>
+      </div>
+      <div id="printableSummaryArea" class="p-5 space-y-3 text-xs"></div>
+      <div class="px-4 py-3 bg-gis-bg border-t border-gis-border flex flex-wrap justify-end gap-2 text-xs font-medium">
+        <button id="btnTxt" class="px-3 py-1.5 rounded-md border border-gis-strong bg-gis-panel">.TXT</button>
+        <button id="btnJson" class="px-3 py-1.5 rounded-md border border-gis-strong bg-gis-panel">.JSON</button>
+        <button id="btnPrint" class="px-3 py-1.5 rounded-md bg-gis-forest text-white">Tipărește / PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
