@@ -189,5 +189,4 @@ if ARATA_GRAFIC_SCANARE:
     plt.savefig("scan_comparatie.png", dpi=150)
     log("Salvat scan_comparatie.png")
     plt.show()
-
 log("Gata")
